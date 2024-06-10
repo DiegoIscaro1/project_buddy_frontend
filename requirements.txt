@@ -9,8 +9,8 @@ requests
 
 # Import
 transformers==4.16.2
-torch==1.11.0
-torchvision==0.12.0
+# torch==1.11.0
+# torchvision==0.12.0
 
 
 # If you want to display datasets, or if your API returns you dataframes,
