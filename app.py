@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import os
 
-def recognize_speech():
+'''def recognize_speech():
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
         st.write("Listening...")
@@ -16,7 +16,7 @@ def recognize_speech():
             st.write("Google Speech Recognition could not understand audio")
         except sr.RequestError as e:
             st.write(f"Could not request results from Google Speech Recognition service; {e}")
-    return None
+    return None'''
 
 def get_prediction(user_input):
     url = "https://buddyapi-qncgwxayla-ew.a.run.app/predict"
