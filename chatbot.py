@@ -50,20 +50,20 @@ def get_answer_chatgpt (messages: list, user_input: str) -> str:
 
 if __name__ == "__main__":
     message_list = []
-    preprompt = '''You’re a chatbot that’s supposed to help people who are depressed or even suicidal.
+    preprompt = '''You're a chatbot that's supposed to help people who are depressed or even suicidal.
 The aim is to ask them simple questions to try and understand their feelings.
 The conversation must end after 5 exchanges. Be as attentive as possible, and keep your exchanges as concise as possible.
 All conversations will be analyzed by a predictive model to determine whether the person is at risk of suicide.
 All you have to do is talk to the user and compile this information into an input to be sent to the model.
 Try to not be to instrusive or too specific.
-Let’s simulate this chatbot'''
+Let's simulate this chatbot by asking how the user is feeling'''
     introduction = get_answer_chatgpt(message_list, preprompt)
-    print(f"Assistant : {introduction}")
+    print(f"\nAssistant: {introduction}")
     for i in range (5):
         print(f"\nUser: ")
         prompt = input()
         answer = get_answer_chatgpt(message_list, prompt)
-        print(f"Assistant : {answer}")
+        print(f"\nAssistant : {answer}")
 
     # Getting user content
     user_messages = "".join(item['content'] for item in message_list if item['role'] == 'user')
