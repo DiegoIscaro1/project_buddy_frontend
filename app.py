@@ -1,22 +1,5 @@
 import streamlit as st
 import requests
-import os
-
-def recognize_speech():
-    recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
-        st.write("Listening...")
-        audio = recognizer.listen(source)
-        st.write("Recognizing...")
-        try:
-            text = recognizer.recognize_google(audio)
-            st.write(f"You said: {text}")
-            return text
-        except sr.UnknownValueError:
-            st.write("Google Speech Recognition could not understand audio")
-        except sr.RequestError as e:
-            st.write(f"Could not request results from Google Speech Recognition service; {e}")
-    return None
 
 def get_prediction(user_input):
     url = "https://buddyapi-qncgwxayla-ew.a.run.app/predict"
@@ -34,15 +17,7 @@ def chatbot(user_input):
 def main():
     st.set_page_config(page_title="Chatbot", page_icon="🤖")
 
-    # Use the correct path format
-    image_path = "/home/diego/code/KiruaaSan/project_buddy/Buddy.jpg"
-
-    if os.path.exists(image_path):
-        st.sidebar.image(image_path, width=100)
-    else:
-        st.sidebar.write("Image not found")
-
-     # Custom styling for the title
+    # Custom styling for the title
     st.markdown(
         """
         <style>
@@ -61,6 +36,10 @@ def main():
     )
 
     st.markdown('<p class="title">Buddy</p>', unsafe_allow_html=True)
+
+    # Sidebar image
+    image_url = "https://github.com/KiruaaSan/project_buddy_frontend/blob/master/Buddy.jpg"  # Replace this with your image URL
+    st.sidebar.image(image_url, width=100)
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
