@@ -1,48 +1,21 @@
 import streamlit as st
+import openai
 import requests
-import os
+import json
 
-def recognize_speech():
-    recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
-        st.write("Listening...")
-        audio = recognizer.listen(source)
-        st.write("Recognizing...")
-        try:
-            text = recognizer.recognize_google(audio)
-            st.write(f"You said: {text}")
-            return text
-        except sr.UnknownValueError:
-            st.write("Google Speech Recognition could not understand audio")
-        except sr.RequestError as e:
-            st.write(f"Could not request results from Google Speech Recognition service; {e}")
-    return None
-
-def get_prediction(user_input):
+def get_prediction(user_input: str) -> int:
     url = "https://buddyapi-qncgwxayla-ew.a.run.app/predict"
     params = {"txt": user_input}
     response = requests.get(url, params=params)
     if response.status_code == 200 and "prediction" in response.json():
         return response.json()["prediction"]
     else:
-        return "An error occurred while fetching the prediction."
-
-def chatbot(user_input):
-    output = get_prediction(user_input)
-    return output
+        return f"An Error {response.status_code} has occurred while retrieving the prediction."
 
 def main():
-    st.set_page_config(page_title="Chatbot", page_icon="🤖")
+    st.set_page_config(page_title="Chatbot", page_icon="🤖", layout="centered")
 
-    # Use the correct path format
-    image_path = "/home/diego/code/KiruaaSan/project_buddy/Buddy.jpg"
-
-    if os.path.exists(image_path):
-        st.sidebar.image(image_path, width=100)
-    else:
-        st.sidebar.write("Image not found")
-
-     # Custom styling for the title
+    # Custom styling for the title
     st.markdown(
         """
         <style>
@@ -60,29 +33,62 @@ def main():
         unsafe_allow_html=True
     )
 
-    st.markdown('<p class="title">Buddy</p>', unsafe_allow_html=True)
+    st.title('🤖 Your AI Buddy')
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+    # Get OpenAI key
+    key = st.secrets.openai.OpenAI_key
+    openai.api_key = key
 
-    def submit():
-        user_input = st.session_state.user_input
-        if user_input:
-            with st.spinner("The chatbot is thinking..."):
-                response = chatbot(user_input)
-            st.session_state.messages.append(("You", user_input))
-            st.session_state.messages.append(("Chatbot", response))
-            st.session_state.user_input = ""
+    # Set up the API endpoint and headers
+    url = "https://api.openai.com/v1/chat/completions"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {key}"
+    }
 
-    # Text input for manual typing
-    st.text_input("Type your message here...", key="user_input", on_change=submit)
+    # Initialize session state
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+        st.session_state.exchange_count = 0
+        st.session_state.user_responses = []
 
-    if st.session_state.messages:
-        for sender, message in st.session_state.messages:
-            if sender == "You":
-                st.markdown(f'<div style="text-align: right; margin-bottom: 10px;"><div style="display: inline-block; background-color: #d3e0ff; padding: 10px; border-radius: 10px;">{message}</div></div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div style="text-align: left; margin-bottom: 10px;"><div style="display: inline-block; background-color: #D3D3D3; padding: 10px; border-radius: 10px;">{message}</div></div>', unsafe_allow_html=True)
+    # Define the questions
+    questions = [
+        "How are you feeling today?",
+        "How has your sleep been lately?",
+        "How is your social life going?"
+    ]
+
+    # Display conversation
+    for message in st.session_state.chat_history:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Display the current question
+    if st.session_state.exchange_count < len(questions):
+        current_question = questions[st.session_state.exchange_count]
+        st.chat_message("assistant").markdown(current_question)
+
+        # Display predefined options for the current question
+        options = ["Perfect!", "Good", "Okay", "Bad", "Really bad"]
+        user_choice = st.selectbox("Choose your response:", options, key=st.session_state.exchange_count)
+
+        if st.button("Submit", key=f"submit_{st.session_state.exchange_count}"):
+            st.session_state.chat_history.append({"role": "user", "content": user_choice})
+            st.session_state.user_responses.append(user_choice)
+            st.session_state.exchange_count += 1
+            st.experimental_rerun()  # Rerun the script to display the next question or analyze the responses
+
+    # Once all questions are answered, analyze the responses
+    if st.session_state.exchange_count == len(questions):
+        st.warning("The conversation has ended. Analyzing the responses...")
+
+        # Aggregate the responses
+        aggregated_responses = " ".join(st.session_state.user_responses)
+        prediction = f"Prediction: {get_prediction(aggregated_responses)}"
+        st.session_state.chat_history.append({"role": "model", "content": prediction})
+        st.chat_message("model").markdown(prediction)
+        st.session_state.exchange_count += 1  # To prevent re-analysis on rerun
 
 if __name__ == "__main__":
     main()
