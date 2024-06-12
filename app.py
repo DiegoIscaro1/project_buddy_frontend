@@ -22,11 +22,6 @@ def get_prediction(user_input: str) -> float:
     else:
         return 0.0
 
-def close_input_chat():
-    user_input = st.session_state.user_input
-    if user_input == 'close':
-        st.session_state.condition_met = True
-
 def main():
     st.set_page_config(page_title="Chatbot", page_icon="🤖", layout="centered")
 
