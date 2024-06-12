@@ -9,10 +9,27 @@ def display_image_with_text(image_path, text):
 def main():
     st.set_page_config(page_title="Chatbot", page_icon="🤖", layout="wide")
 
+    st.sidebar.markdown("""
+    <style>
+    .css-18e3th9 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #FFD700; /* Gold color */
+        text-align: left;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        text-shadow: 2px 2px #888888;
+        border-left: 6px solid #FFD700;
+        padding-left: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
     st.title('🤖 Your AI Buddy')
 
     # Add navigation menu
-    page = st.sidebar.radio("Navigation", ["About the app"])
+    page = ("About the app")
 
     if page == "About the app":
         chat_page()
