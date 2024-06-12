@@ -2,6 +2,17 @@ import streamlit as st
 import openai
 import requests
 import json
+from googletrans import Translator
+
+def translate_text(text, src_language, dest_language):
+    translator = Translator()
+    translation = translator.translate(text, src=src_language, dest=dest_language)
+    return translation.text
+
+def detect_language(text):
+    translator = Translator()
+    detection = translator.detect(text)
+    return detection.lang
 
 def get_prediction(user_input: str) -> int:
     url = "https://buddyapi-qncgwxayla-ew.a.run.app/predict"
@@ -65,24 +76,22 @@ def main():
         # Text input for manual typing
         user_input = st.chat_input("Talk to your AI Buddy...")
         if user_input:
+            user_language = detect_language(user_input)
             st.chat_message("user").markdown(user_input)
             st.session_state.chat_history.append({"role": "user", "content": user_input})
             st.session_state.exchange_count += 1
             messages = [
-                        {"role": "system", "content": '''You're a friendly and caring chatbot
-                     that's been trained to help people who are feeling depressed or suicidal.
-                     Your goal is to provide a safe and supportive space for users to express their feelings and thoughts.
-                     You should ask open-ended questions to encourage users to talk, and actively listen to their responses.
-                     If the user's responses indicate a high level of suicidal risk,
-                     you should provide them with resources and support to help them stay safe.
-                     However, if the user's responses indicate a lower level of risk,
-                     you can engage in a more casual conversation while still being mindful of their emotional state.'''},
-                        *st.session_state.chat_history
-                        ]
+                {"role": "system", "content": '''You're a friendly and caring chatbot
+                 that's been trained to help people who are feeling depressed or suicidal.
+                 Your goal is to provide a safe and supportive space for users to express their feelings and thoughts.
+                 You should ask open-ended questions to encourage users to talk, and actively listen to their responses.
+                 '''},
+                *st.session_state.chat_history
+            ]
             data = {
                 "model": "gpt-3.5-turbo",
                 "messages": messages,
-                "max_tokens": 75
+                "max_tokens": 120
             }
             response = requests.post(url, headers=headers, data=json.dumps(data))
             response_data = json.loads(response.text)
@@ -96,22 +105,25 @@ def main():
 
             # Getting user content for prediction
             user_messages = "".join(item["content"] for item in st.session_state.chat_history if item["role"] == 'user')
-            st.session_state.prediction = get_prediction(user_messages)
 
-            # If too many session or prediction to high the chat closes
+            # Translate user messages to English for prediction
+            translated_user_messages = translate_text(user_messages, src_language=user_language, dest_language='en')
+            st.session_state.prediction = get_prediction(translated_user_messages)
+
+            # If too many sessions or prediction is too high, the chat closes
             if st.session_state.prediction > 0.85:
                 st.warning("End of conversation")
                 end_prompt = '''You're a friendly and caring chatbot operating in Belgium
                      and you've been trained to help people who are feeling depressed or suicidal.
                      Your goal is to provide a safe and supportive space for users to express their feelings and thoughts.
-                     The user you currently talking with has showed great signs of distress.
+                     The user you are currently talking with has shown great signs of distress.
                      Can you give him some advice and point him in the right direction?
                      Be caring while giving some good advice.
                      However, the situation is really concerning'''
                 end_message = [
                     {"role": "system", "content": end_prompt},
                     *st.session_state.chat_history
-                    ]
+                ]
                 data = {
                     "model": "gpt-3.5-turbo",
                     "messages": end_message,
@@ -134,7 +146,7 @@ def main():
                 end_message = [
                     {"role": "system", "content": end_prompt},
                     *st.session_state.chat_history
-                    ]
+                ]
                 data = {
                     "model": "gpt-3.5-turbo",
                     "messages": end_message,
@@ -150,7 +162,7 @@ def main():
             elif st.session_state.exchange_count > 5:
                 st.warning("End of conversation")
                 with st.chat_message("assistant"):
-                    st.markdown("Thank you for this nice discussions! Have a nice day")
+                    st.markdown("Thank you for this nice discussion! Have a nice day")
                 st.session_state.open = False
 
             else:
