@@ -26,8 +26,43 @@ def main():
     st.set_page_config(page_title="Chatbot", page_icon="🤖", layout="centered")
 
     st.title('🤖 Your AI Buddy')
+    st.markdown('🚨 This chatbot offers support for emotional distress but is not a substitute for professional help or emergency services. In a crisis, please call emergency services🚨')
 
     openai.api_key = st.secrets["openai"]["OpenAI_key"]
+
+    # Add CSS for the restart button
+    st.markdown(
+        """
+        <style>
+            .restart-button {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: #f63366;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                z-index: 1000;
+            }
+            .restart-button:hover {
+                background-color: #d12f5b;
+            }
+        </style>
+        <script>
+            function restartChatbot() {
+                document.getElementById('restart-button').click();
+            }
+        </script>
+        """, unsafe_allow_html=True
+    )
+
+    # Create the restart button
+    if st.button("Restart Chatbot", key="restart"):
+        st.session_state.clear()
+        st.experimental_rerun()
 
     introduction_line = "Hi! How are you feeling today?"
     if "chat_history" not in st.session_state:
@@ -50,7 +85,7 @@ def main():
 
             translated_user_input = translate_text(user_input, src_language=user_language)
             st.session_state.prediction = get_prediction(translated_user_input)
-            st.markdown(st.session_state.prediction)
+            #st.markdown(st.session_state.prediction) # To check probability
 
             messages = [
                 {"role": "system", "content": '''You're a friendly and caring chatbot
@@ -63,7 +98,7 @@ def main():
             data = {
                 "model": "gpt-3.5-turbo",
                 "messages": messages,
-                "max_tokens": 120
+                "max_tokens": 150
             }
             url = "https://api.openai.com/v1/chat/completions"
             headers = {
@@ -105,7 +140,7 @@ def main():
                     st.markdown("In Belgium, you can call 1813, the suicide prevention hotline. They're available 24/7 to listen and help.")
                 st.session_state.open = False
 
-            elif st.session_state.prediction > 0.5 and st.session_state.exchange_count > 5:
+            elif st.session_state.prediction > 0.5:
                 st.warning("End of conversation")
                 end_prompt = '''You are a friendly, caring chatbot operating in Belgium and have been trained to help people who are feeling depressed or suicidal.
                 Your goal is to provide users with a safe and supportive space to express their feelings and thoughts.
