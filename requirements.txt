@@ -19,5 +19,8 @@ transformers==4.16.2
 # Data science
 # pandas
 
+# Google translator
+googletrans==4.0.0-rc1
+
 # Open AI
 openai==1.30.1
