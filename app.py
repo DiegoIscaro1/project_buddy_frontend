@@ -39,10 +39,31 @@ def main():
                 padding-bottom: 20px;
                 text-shadow: 2px 2px #888888;
             }
+
+            /* Style for chat messages */
+            .chat-message {
+                padding: 10px;
+                margin: 10px;
+                border-radius: 10px;
+                max-width: 70%;
+            }
+
+            /* Style for user messages */
+            .user-message {
+                background-color: #DCF8C6; /* Light green background */
+                align-self: flex-start;
+            }
+
+            /* Style for assistant messages */
+            .assistant-message {
+                background-color: #F0F0F0; /* Light gray background */
+                align-self: flex-end;
+            }
         </style>
         """,
         unsafe_allow_html=True
     )
+
 
     st.title('🤖 Your AI Buddy')
 
@@ -167,6 +188,7 @@ def main():
 
             else:
                 st.session_state.open = True
+
 
 if __name__ == "__main__":
     main()
