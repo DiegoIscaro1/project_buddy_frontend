@@ -20,7 +20,7 @@ transformers==4.16.2
 # pandas
 
 # Google translator
-googletrans==4.0.0-rc1
+googletrans==3.0.0
 
 # Open AI
 openai==1.30.1
