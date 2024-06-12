@@ -51,21 +51,18 @@ def main():
                 background-color: #d12f5b;
             }
         </style>
+        <script>
+            function restartChatbot() {
+                document.getElementById('restart-button').click();
+            }
+        </script>
         """, unsafe_allow_html=True
     )
 
-    # Add a hidden button for Streamlit to detect clicks
-    if st.button("Restart Chatbot"):
-        if "chat_history" in st.session_state:
-            del st.session_state["chat_history"]
-        if "exchange_count" in st.session_state:
-            del st.session_state["exchange_count"]
-        if "open" in st.session_state:
-            del st.session_state["open"]
+    # Create the restart button
+    if st.button("Restart Chatbot", key="restart"):
+        st.session_state.clear()
         st.experimental_rerun()
-
-    # Add the visible button with the CSS class
-    st.markdown('<button class="restart-button" onclick="document.getElementsByClassName(\'stButton\')[0].click()">Restart Chatbot</button>', unsafe_allow_html=True)
 
     introduction_line = "Hi! How are you feeling today?"
     if "chat_history" not in st.session_state:
