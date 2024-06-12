@@ -73,10 +73,7 @@ def main():
                      that's been trained to help people who are feeling depressed or suicidal.
                      Your goal is to provide a safe and supportive space for users to express their feelings and thoughts.
                      You should ask open-ended questions to encourage users to talk, and actively listen to their responses.
-                     If the user's responses indicate a high level of suicidal risk,
-                     you should provide them with resources and support to help them stay safe.
-                     However, if the user's responses indicate a lower level of risk,
-                     you can engage in a more casual conversation while still being mindful of their emotional state.'''},
+                     '''},
                         *st.session_state.chat_history
                         ]
             data = {
