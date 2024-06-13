@@ -81,10 +81,9 @@ def main():
             # Prediction analysis
             with st.spinner('Analysing discussion...'):
                 st.session_state.prediction = get_prediction(translated_user_input)
-            # st.markdown(st.session_state.prediction) # To check probability
 
                 # If prediction high -> ask chatbot to redirect user through right people
-                if st.session_state.prediction > 0.85:
+                if st.session_state.prediction > 0.5:
 
                     end_assistant_response = "Your wellbeing is important and there are people who want to help you. You are not alone. Please consider contacting one of the links below."
 
@@ -94,23 +93,6 @@ def main():
                     resources = ["Zelfmoordlijn 1813 (Dutch): Provides 24/7 confidential support for emotional distress or suicidal thoughts via phone or online chat at www.zelfmoord1813.be.",
                     "Télé-Accueil (French): Offers a listening ear to anyone in need, reachable at 107 or www.tele-accueil.be.",
                     "Community Help Service (CHS) (English): A 24/7 helpline in English offering emotional support, available at 02 648 40 14 or www.chsbelgium.org."
-                    ]
-                    for resource in resources:
-                        st.info(resource, icon="ℹ️")
-                    st.session_state.open = False
-                    st.button('Restart Chat', on_click=st.session_state.clear)
-
-                # If prediction high but not too concerning -> ask chatbot to give some advice
-                elif st.session_state.prediction > 0.40 and st.session_state.exchange_count > 5:
-
-                    end_assistant_response = "Your wellbeing is important. Below you will find some advice..."
-
-                    with st.chat_message("assistant"):
-                        st.markdown(f'<p class="stMarkdown">{end_assistant_response}</p>', unsafe_allow_html=True)
-
-                    resources = ["Centre de Crise (French): Provides advice for well-being during crises, accessible at https://centredecrise.be/fr/que-pouvez-vous-faire/ensemble/soutien-international/soutien-pyschosocial-en-belgique/je-cherche.",
-                    "Fit in je hoofd (Dutch): Provides tips and tools for maintaining mental health and well-being, accessible at www.fitinjehoofd.be.",
-                    "Mental Health Europe (English): Provides information and resources for mental health and well-being across Europe, accessible at www.mhe-sme.org."
                     ]
                     for resource in resources:
                         st.info(resource, icon="ℹ️")
