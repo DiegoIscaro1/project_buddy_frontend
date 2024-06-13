@@ -43,7 +43,7 @@ def main():
     <style>
     /* Style the chat messages */
     .stMarkdown {
-        font-size: 20px;
+        font-size: 25px;
     }
     </style>
     '''
@@ -86,55 +86,35 @@ def main():
                 # If prediction high -> ask chatbot to redirect user through right people
                 if st.session_state.prediction > 0.85:
 
-                    end_prompt = '''You are a friendly, caring chatbot operating in Belgium
-                        and you've been trained to help people who are feeling depressed or suicidal.
-                        The user you are talking to is showing great signs of distress.
-                        Give him a comforting reply for him to feel better. Don't ask a question.
-                        '''
-                    end_message = [
-                        {"role": "system", "content": end_prompt},
-                        *st.session_state.chat_history
-                    ]
-                    data = {
-                        "model": "gpt-3.5-turbo",
-                        "messages": end_message,
-                        "max_tokens": 1000
-                    }
-                    response = requests.post(url, headers=headers, data=json.dumps(data))
-                    response_data = json.loads(response.text)
-                    end_assistant_response = response_data["choices"][0]["message"]["content"]
+                    end_assistant_response = "Your wellbeing is important and there are people who want to help you. You are not alone. Please consider contacting one of the links below."
 
                     with st.chat_message("assistant"):
                         st.markdown(f'<p class="stMarkdown">{end_assistant_response}</p>', unsafe_allow_html=True)
 
-                    st.info('''Community Help Service (CHS): A 24/7 helpline available in English for anyone in need.
-                            They can be reached at 02 648 40 14 or through their website at www.chsbelgium.org.''', icon="ℹ️")
+                    resources = ["Zelfmoordlijn 1813 (Dutch): Provides 24/7 confidential support for emotional distress or suicidal thoughts via phone or online chat at www.zelfmoord1813.be.",
+                    "Télé-Accueil (French): Offers a listening ear to anyone in need, reachable at 107 or www.tele-accueil.be.",
+                    "Community Help Service (CHS) (English): A 24/7 helpline in English offering emotional support, available at 02 648 40 14 or www.chsbelgium.org."
+                    ]
+                    for resource in resources:
+                        st.info(resource, icon="ℹ️")
                     st.session_state.open = False
                     st.button('Restart Chat', on_click=st.session_state.clear)
 
                 # If prediction high but not too concerning -> ask chatbot to give some advice
-                elif st.session_state.prediction > 0.35 and st.session_state.exchange_count > 5:
+                elif st.session_state.prediction > 0.40 and st.session_state.exchange_count > 5:
 
-                    end_prompt = '''You are a friendly, caring chatbot operating in Belgium and have been trained to help people who are feeling depressed or suicidal.
-                    Your goal is to provide users with a safe and supportive space to express their feelings and thoughts.
-                    The user you're talking to is showing signs of sadness. However, the situation doesn't seem to be really worrying.
-                    Can you give him some advice to cheer him up? Be caring while giving some good advice.'''
-                    end_message = [
-                        {"role": "system", "content": end_prompt},
-                        *st.session_state.chat_history
-                    ]
-                    data = {
-                        "model": "gpt-3.5-turbo",
-                        "messages": end_message,
-                        "max_tokens": 1000
-                    }
-                    response = requests.post(url, headers=headers, data=json.dumps(data))
-                    response_data = json.loads(response.text)
-                    end_assistant_response = response_data["choices"][0]["message"]["content"]
+                    end_assistant_response = "Your wellbeing is important. Below you will find some advice..."
+
                     with st.chat_message("assistant"):
                         st.markdown(f'<p class="stMarkdown">{end_assistant_response}</p>', unsafe_allow_html=True)
+
+                    resources = ["Centre de Crise (French): Provides advice for well-being during crises, accessible at https://centredecrise.be/fr/que-pouvez-vous-faire/ensemble/soutien-international/soutien-pyschosocial-en-belgique/je-cherche.",
+                    "Fit in je hoofd (Dutch): Provides tips and tools for maintaining mental health and well-being, accessible at www.fitinjehoofd.be.",
+                    "Mental Health Europe (English): Provides information and resources for mental health and well-being across Europe, accessible at www.mhe-sme.org."
+                    ]
+                    for resource in resources:
+                        st.info(resource, icon="ℹ️")
                     st.session_state.open = False
-                    st.info('Need Well-Being advice in Belgium? 🇧🇪 Visit [Psychosocial Support](https://centredecrise.be/fr/que-pouvez-vous-faire/ensemble/soutien-international/soutien-pyschosocial-en-belgique/je-cherche)', icon="ℹ️")
                     st.button('Restart Chat', on_click=st.session_state.clear)
 
                 # If prediction low -> keep talking with user
@@ -143,7 +123,6 @@ def main():
                     {"role": "system", "content": '''You're a friendly and caring chatbot
                     that's been trained to help people who are feeling depressed or suicidal.
                     Your goal is to provide a safe and supportive space for users to express their feelings and thoughts.
-                    You should ask open-ended questions to encourage users to talk, and actively listen to their responses.
                     Try to remain neutral in your question. Don't exceed 100 tokens in your answer!
                     '''},
                     *st.session_state.chat_history
