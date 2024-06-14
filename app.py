@@ -83,7 +83,7 @@ def main():
                 st.session_state.prediction = get_prediction(translated_user_input)
 
                 # If prediction high -> ask chatbot to redirect user through right people
-                if st.session_state.prediction > 0.5:
+                if st.session_state.prediction > 0.70:
 
                     end_assistant_response = "Your wellbeing is important and there are people who want to help you. You are not alone. Please consider contacting one of the links below."
 
@@ -105,7 +105,8 @@ def main():
                     {"role": "system", "content": '''You're a friendly and caring chatbot
                     that's been trained to help people who are feeling depressed or suicidal.
                     Your goal is to provide a safe and supportive space for users to express their feelings and thoughts.
-                    Try to remain neutral in your question. Don't exceed 100 tokens in your answer!
+                    Try to remain neutral in your question. Don't exceed 100 tokens in your answer! Don't repeat yourself.
+                    always end with an open question
                     '''},
                     *st.session_state.chat_history
                 ]
